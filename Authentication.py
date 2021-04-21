@@ -11,43 +11,73 @@
 
 import random
 
-database = {}
+database = {
+    9159786843: ['immah', 'stuart', '1234567890']
+}
 
 def init ():
-    isValidOptionSelected =  False
     print("Welcome to KCB Bank")
+    
     import datetime
     e=datetime.datetime.now()
     print(e.strftime("%y - %m - %d . %H : %M"))
-
-    while isValidOptionSelected == False:
+    
+    haveAccount = int(input("Do you have an Account? 1 (Yes) 2 (No) \n"))
+    
+    if haveAccount == 1:
         
-        haveAccount = int(input("Do you have an Account? 1 (Yes) 2 (No) \n"))
+        login()
+    
+    elif haveAccount == 2:
         
-        if(haveAccount == 1):
-            isValidOptionSelected = True
-            login()
-        elif (haveAccount == 2):
-            isValidOptionSelected = True
-            print(register())
-        else:
-            print("You have selected an invalid option")
+        register()
+    
+    else:
+        
+        print("You have selected an invalid option")
 
 def login():
     print("*** Login ***")
-    isLoginSuccessful = False
+    
+    accountNumberfromUser = input("Enter your account number: \n")
+    
+    is_account_number_valid = account_number_validation(accountNumberfromUser)
 
-    while isLoginSuccessful == False:
-        accountNumberfromUser = int(input("Enter your account number: \n"))
+    if is_account_number_valid:
         password = input("Enter your password: \n")
 
         for accountNumber, userDetails in database.items():
-            if (accountNumber == accountNumberfromUser):
-                if(userDetails[3] == password):
-                    isLoginSuccessful=True
+            if accountNumber == int(accountNumberfromUser):
+                if userDetails[3] == password:
+                    bankoperation(userDetails)
 
         print("Invalid account or password")
-    bankoperation(userDetails)
+        login()
+    else:
+        init()
+def account_number_validation(accountNumber):
+    #check that account number is not empty
+    #check that account number is 10 digits
+    #check if account number is an integer
+    if accountNumber:
+
+        if len(str(accountNumber)) == 10:
+            
+            try:
+                int(accountNumber)
+                return True
+                
+            except ValueError:
+                    print("Invalid Account Number")
+                    return False
+        
+        else:
+            print("Account Number should be 10 digits")
+            return False
+    else:
+        print("Account Number cannot be empty")
+        return False
+
 
 def register():
     print("**** Register ****")
@@ -56,8 +86,11 @@ def register():
     lastname = input("Enter Your Last Name: \n")
     password = input("Enter a suitable password \n")
     
-    accountNumber = accountNumberGeneration()
-    
+    try:
+        accountNumber = accountNumberGeneration()
+    except ValueError:
+        print("Account Generation Failed. Please Try Again!")
+        init()
     database[accountNumber] = [ firstname, lastname, email, password ]
     
     print("Your Acoount has been created succesfully")
